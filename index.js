@@ -15,9 +15,9 @@ const helmet = require("helmet");
 const MongoDBStore = require("connect-mongo");
 const User = require("./models/user");
 
-// if (process.env.NODE_ENV !== "production") {
-require("dotenv").config();
-// }
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const campgroundRoutes = require("./routes/campground");
 const reviewRoutes = require("./routes/reviews");
 const userRoutes = require("./routes/user");
@@ -52,7 +52,7 @@ const storeVariable = MongoDBStore.create({
   mongoUrl: db_url,
   touchAfter: 24 * 60 * 60,
   crypto: {
-    secret: "rew123",
+    secret: process.env.SECRET || "rew123",
   },
 });
 
@@ -62,7 +62,7 @@ storeVariable.on("error", function (e) {
 
 const sessionConfig = {
   store: storeVariable,
-  secret: "rew123",
+  secret: process.env.SECRET || "rew123",
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -108,6 +108,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("campgrounds/error", { err });
 });
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
